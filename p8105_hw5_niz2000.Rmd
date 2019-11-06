@@ -33,3 +33,9 @@ iris_complete
 ```
 
 
+# Problem 2
+```{r}
+list.files("/Users/Michael/Documents/Columbia/Fall 2019/Data Science/p8105_hw5_niz2000/data")
+```
+
+
