@@ -34,8 +34,30 @@ iris_complete
 
 
 # Problem 2
+
+## Load in the HW 5 Zipfile Data
 ```{r}
-list.files("/Users/Michael/Documents/Columbia/Fall 2019/Data Science/p8105_hw5_niz2000/data")
+data_df = tibble(
+  participant = list.files(path = "./data")
+)
+data_df
 ```
 
+## 
+```{r} 
+data_df = function(path){
+  case_control_df = read_csv(path)
+  case_control_df 
+}
+directory = "./data"
+study_df = tibble(
+  observation = list.files(path = "./data"),
+    files = str_c(directory, "/",observation)) %>%
+  mutate(
+    weekly_data = map(files, read_csv),
+    observation = str_replace(observation, ".csv","")) %>%
+  unnest()
+
+study_df 
+```
 
