@@ -19,8 +19,9 @@ iris_with_missing = iris %>%
 iris_with_missing
 ```
 
+
 ## Function to Replace Missing Values
-```{r}
+```{r Function to Replace Missing Values}
 replace_missing = function(x) {
   if (is.numeric(x)) {
     ifelse(is.na(x), mean(x, na.rm = TRUE), x)
@@ -43,6 +44,7 @@ data_df = tibble(
 data_df
 ```
 
+
 ## Iterate over Files Names
 ```{r} 
 data_df = function(path){
@@ -57,21 +59,28 @@ study_df = tibble(
     weekly_data = map(files, read_csv),
     observation = str_replace(observation, ".csv","")) %>%
   unnest() %>%
+  rename(participant = observation) %>%
   mutate(
-    study_arm = if_else(observation %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
-        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", observation),
+    study_arm = if_else(participant %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
+        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", participant),
     study_arm = if_else(study_arm %in% c("exp_01", "exp_02", "exp_03", "exp_04", "exp_05",
-        "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm))
+        "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm)) %>%
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    values_to = "observation") 
 study_df
 ```
-
-  #pivot_longer(
-    #week_1:week_8,
-    #names_to = "weekly_data",
-    #values_to = "activity") 
+ 
     
 ## Spaghetti Plot of Observations for Each Subject Over Time
-```{r}
-
+```{r Spaghetti Plot}
+study_df %>% 
+  group_by(participant, week) %>% 
+  ggplot(aes(x = week, y = observation, group = participant, color = study_arm)) +
+  geom_line() +
+  labs(caption = "Observations for Each Subject Over Time") + 
+  viridis::scale_color_viridis(
+    discrete = TRUE)
 ```
 
