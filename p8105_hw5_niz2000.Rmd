@@ -58,10 +58,10 @@ study_df = tibble(
     observation = str_replace(observation, ".csv","")) %>%
   unnest() %>%
   mutate(
-    study_arm = if_else(observation %in% c("con_01", "con_02", "con_03", "con_04",
-        "con_05", "con_06", "con_07", "con_08", "con_09", "con_10"), "control", observation),
-    study_arm = if_else(study_arm %in% c("exp_01", "exp_02", "exp_03", "exp_04",
-        "exp_05", "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm))
+    study_arm = if_else(observation %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
+        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", observation),
+    study_arm = if_else(study_arm %in% c("exp_01", "exp_02", "exp_03", "exp_04", "exp_05",
+        "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm))
 study_df
 ```
 
@@ -69,3 +69,9 @@ study_df
     #week_1:week_8,
     #names_to = "weekly_data",
     #values_to = "activity") 
+    
+## Spaghetti Plot of Observations for Each Subject Over Time
+```{r}
+
+```
+
