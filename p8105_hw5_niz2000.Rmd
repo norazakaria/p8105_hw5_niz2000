@@ -143,6 +143,14 @@ proportion_rejected
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
 ```{r}
-
+average_estimate = results %>%
+  group_by(beta1) %>%
+  mutate(average_estimate = mean(estimate)) %>%
+  group_by(beta1, average_estimate) %>%
+  ggplot(aes(x = beta1, y = average_estimate)) + 
+    geom_point() + 
+    geom_line(group = 1) 
+average_estimate
 ```
 
+Make a plot showing the average estimate of β̂ 1 on the y axis and the true value of β1 on the x axis. Make a second plot (or overlay on the first) the average estimate of β̂ 1 only in samples for which the null was rejected on the y axis and the true value of β1 on the x axis. Is the sample average of β̂ 1 across tests for which the null is rejected approximately equal to the true value of β1? Why or why not?
