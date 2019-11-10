@@ -59,25 +59,31 @@ study_df = tibble(
     weekly_data = map(files, read_csv),
     observation = str_replace(observation, ".csv","")) %>%
   unnest() %>%
-  rename(participant = observation) %>%
+  rename(participant_id = observation) %>%
   mutate(
-    study_arm = if_else(participant %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
-        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", participant),
+    study_arm = if_else(participant_id %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
+        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", participant_id),
     study_arm = if_else(study_arm %in% c("exp_01", "exp_02", "exp_03", "exp_04", "exp_05",
         "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm)) %>%
   pivot_longer(
     week_1:week_8,
     names_to = "week",
-    values_to = "weekly_observation") 
+    values_to = "weekly_data") %>%
+  mutate(week = str_replace(week, "week_", "")) %>%
+  select(-files)
 study_df
 ```
  
+ subject_id = str_replace(subject_id, ".csv" , ""),
+ week = str_replace(week, "week_", ""),
+ study_arm = str_replace(study_arm, "con","control"),
+ study_arm = str_replace(study_arm, "exp","experimental"),
     
 ## Spaghetti Plot of Observations for Each Subject Over Time
 ```{r Spaghetti Plot}
 study_df %>% 
-  group_by(participant, week) %>% 
-  ggplot(aes(x = week, y = weekly_observation, group = participant, color = study_arm)) +
+  group_by(participant_id, week) %>% 
+  ggplot(aes(x = week, y = weekly_data, group = participant_id, color = study_arm)) +
   geom_line() +
   labs(caption = "Observations for Each Subject Over Time") + 
   viridis::scale_color_viridis(
@@ -94,20 +100,17 @@ linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
     x = rnorm(n, mean = 1, sd = 1),
     y = beta0 + beta1 * x + rnorm(n, 0, 50^0.5)
   )
-  
   ls_fit = lm(y ~ x, data = regression_data) 
-  
   broom::tidy(ls_fit) %>%
     filter(term == "x")
 }
 
-  regression_results = rerun(10000, linear_regression()) %>%
+  regression_results = rerun(100, linear_regression()) %>%
     bind_rows()
-  
   results = tibble(
     beta1 = c(0, 1, 2, 3, 4, 5, 6)) %>%
     mutate(
-      output_list = map(.x = beta1, ~rerun(10000, linear_regression(beta1 = .x))),
+      output_list = map(.x = beta1, ~rerun(100, linear_regression(beta1 = .x))),
       estimate_dfs = map(output_list, bind_rows)) %>%
     select(-output_list) %>%
     unnest(estimate_dfs)
@@ -117,15 +120,37 @@ results
 
 ## Plot Showing the Proportion of Times the Null was Rejected
 
-```{r}
-results %>%
+```{r Effect Size and Power}
+proportion_rejected = results %>%
+  mutate(rejection = cut(p.value, breaks=c(0, 0.05, Inf), 
+                         labels=c("Rejected", "Not_Rejected"))) %>%
+  group_by(beta1, rejection) %>%
+  summarise(count = n()) %>%
+  mutate(
+    proportion = count / sum(count),
+    as.character(beta1)) %>%
+  filter(rejection == "Rejected") %>%
+  ggplot(aes(x = beta1, y = proportion)) + 
+    geom_point() + 
+    geom_line(group = 1) +
+    labs(
+      title = "Association Between Effect Size and Power",
+      x = "Beta 1 True Value",
+      y = "Proportion of Null Rejection")
+proportion_rejected
+```
+ 
+ EEOP_prevalence = Posture %>%
+  mutate(EEOP_categorization=cut(eop_size_mm, breaks=c(-Inf, 10, Inf), labels=c("No EEOP", "EEOP"))) %>%
+  group_by(EEOP_categorization) %>%
+  summarise(n=n()) %>%
+  mutate(Prevalence = n / sum(n)) %>%
+  knitr::kable(format= 'pandoc', caption = "Table: EEOP Prevalence")
+EEOP_prevalence
+ 
   mutate(
     rejection = if_else(p.value < 0.05, "rejected", p.value),
     rejection = if_else(rejection >= 0.05, "fail_to_reject", rejection)) %>%
-  ggplot(aes(x = estimate, y = rejected)) + 
-  geom_line()
-```
-
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
 ```{r}
