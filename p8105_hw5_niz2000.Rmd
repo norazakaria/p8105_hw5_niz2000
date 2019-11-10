@@ -148,6 +148,34 @@ results
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
 
+```{r Average and True Beta 1}
+plot1 = results %>%
+  group_by(beta1) %>%
+  summarise(mean_estimate = mean(estimate))
+plot1
+
+plot2 = results %>%
+  mutate(rejection = cut(p.value, breaks=c(0, 0.05, Inf), 
+    labels=c("Rejected", "Not_Rejected"))) %>%
+  filter(rejection == "Rejected") %>%
+  group_by(beta1) %>%
+  summarise(mean_estimate = mean(estimate))
+plot2
+
+ggplot(plot1, aes(x = beta1, y = mean_estimate)) + 
+  geom_point(aes(color = "Overall")) + 
+    geom_line(aes(color = "Overall")) +
+  geom_point(data = plot2, aes(x = beta1, y = mean_estimate, color = "When Null Was Rejected")) +
+    geom_line(data = plot2, aes(x = beta1, y = mean_estimate, color = "When Null Was Rejected")) +
+  labs(
+    title = "Average vs True Estimate of β1",
+    x = "True Value of β 1",
+    y = "Average Estimate of β̂ 1",
+    color = "") +
+    viridis::scale_color_viridis(discrete = TRUE) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
 
 
 
