@@ -8,7 +8,7 @@ output: github_document
 # Problem 1
 
 ## Load Tidyverse and the Iris Data
-```{r}
+```{r Load Iris Data}
 library(tidyverse)
 
 set.seed(10)
@@ -37,7 +37,7 @@ iris_complete
 # Problem 2
 
 ## Load in the HW 5 Zipfile Data
-```{r}
+```{r Load Zipfile Data}
 data_df = tibble(
   participant = list.files(path = "./data")
 )
@@ -46,7 +46,7 @@ data_df
 
 
 ## Iterate over Files Names
-```{r} 
+```{r Iterate Over File Names} 
 data_df = function(path){
   case_control_df = read_csv(path)
   case_control_df 
@@ -94,7 +94,7 @@ study_df %>%
 # Problem 3
 
 ## Set the Regression Design Elements
-```{r}
+```{r Regression}
 linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
   regression_data = tibble(
     x = rnorm(n, mean = 1, sd = 1),
@@ -123,7 +123,7 @@ results
 ```{r Effect Size and Power}
 proportion_rejected = results %>%
   mutate(rejection = cut(p.value, breaks=c(0, 0.05, Inf), 
-                         labels=c("Rejected", "Not_Rejected"))) %>%
+    labels=c("Rejected", "Not_Rejected"))) %>%
   group_by(beta1, rejection) %>%
   summarise(count = n()) %>%
   mutate(
@@ -140,17 +140,6 @@ proportion_rejected = results %>%
 proportion_rejected
 ```
  
- EEOP_prevalence = Posture %>%
-  mutate(EEOP_categorization=cut(eop_size_mm, breaks=c(-Inf, 10, Inf), labels=c("No EEOP", "EEOP"))) %>%
-  group_by(EEOP_categorization) %>%
-  summarise(n=n()) %>%
-  mutate(Prevalence = n / sum(n)) %>%
-  knitr::kable(format= 'pandoc', caption = "Table: EEOP Prevalence")
-EEOP_prevalence
- 
-  mutate(
-    rejection = if_else(p.value < 0.05, "rejected", p.value),
-    rejection = if_else(rejection >= 0.05, "fail_to_reject", rejection)) %>%
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
 ```{r}
