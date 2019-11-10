@@ -7,6 +7,8 @@ output: github_document
 
 # Problem 1
 
+Problem 1 loads the iris dataset from the tidyverse package, and includes some missing values in each column.
+
 ## Load Tidyverse and the Iris Data
 ```{r Load Iris Data}
 library(tidyverse)
@@ -19,8 +21,13 @@ iris_with_missing = iris %>%
 iris_with_missing
 ```
 
+Each of the 5 variables, "Sepal.Length," "Sepal.Width," "Petal.Length," "Petal.Width," and "Species" contain missing values, indicated by an NA. The descriptive variable names were preserved.
+
 
 ## Function to Replace Missing Values
+
+This function takes a vector as an argument, and replaces all missing values from the uploaded Iris data titled "iris_with_missing," and returns a resulting vector titled "iris_complete."
+
 ```{r Function to Replace Missing Values}
 replace_missing = function(x) {
   if (is.numeric(x)) {
@@ -32,6 +39,9 @@ replace_missing = function(x) {
 iris_complete = map_df(iris_with_missing, replace_missing)
 iris_complete
 ```
+
+Missing values for each numeric variable "Sepal.Length," "Sepal.Width," "Petal.Length," and "Petal.Width" were replaced with the mean of non-missing values for that particular variable. For the character variable "Species," all missing values were replaced with the name "virginica." The map statement was used in the function.
+
 
 
 # Problem 2
