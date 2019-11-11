@@ -212,6 +212,7 @@ ggplot(plot1, aes(x = beta1, y = mean_estimate)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-As displayed in the plot, the sample average of β̂1 across tests for which the null is rejected differs from the true value of β1. Apart from when the true β1 is 0 and 6, the sample average of β̂1 is greater than the true value of β1, which the greatest divergence when the true value of β1 is 1. Why?
+As displayed in the plot, the sample average of β̂1 across tests for which the null is rejected differs from the true value of β1. Apart from when the true β1 is 0 and 6, the sample average of β̂1 is greater than the true value of β1, which the greatest divergence when the true value of β1 is 1. 
 
+The sample average of β̂1 across tests for which the null is rejected is not approximately equal to the true value of β1, which is what we would expect. As we have filtered our estimates to only include significant p-values based on our regression simulation, these values are those that were significantly different from the true values of β1. As we wouldn't expect these filtered individual β̂1 estimates to be close to the true β1, we also don't expect that the average of those β̂1 estimates would be close to the true β1.
 
