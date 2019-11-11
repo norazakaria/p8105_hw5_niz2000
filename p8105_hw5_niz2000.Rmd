@@ -46,7 +46,9 @@ Missing values for each numeric variable "Sepal.Length," "Sepal.Width," "Petal.L
 
 # Problem 2
 
-## Load in the HW 5 Zipfile Data
+Problem 2 loads a zip file containing data from a longitudinal study, including a control arm and an experimental arm. Data for each participant is included in a separate file, and file names include the subject ID and arm.
+
+## Load in the Zipfile Data
 ```{r Load Zipfile Data}
 data_df = tibble(
   participant = list.files(path = "./data")
@@ -54,9 +56,13 @@ data_df = tibble(
 data_df
 ```
 
+Loading the zip file data resulted in a dataframe that contains all file names, using the list.files function.
 
 ## Iterate over Files Names
-```{r Iterate Over File Names} 
+
+This next step creates a tidy dataframe containing data from all study participants, including their subject ID, the control or experimental treatment arm, and observations over time.
+
+```{r Iterate Over File Names, message = FALSE, warning = FALSE} 
 data_df = function(path){
   case_control_df = read_csv(path)
   case_control_df 
@@ -69,10 +75,9 @@ study_df = tibble(
     weekly_data = map(files, read_csv),
     observation = str_replace(observation, ".csv","")) %>%
   unnest() %>%
-  rename(participant_id = observation) %>%
   mutate(
-    study_arm = if_else(participant_id %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
-        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", participant_id),
+   study_arm = if_else(observation %in% c("con_01", "con_02", "con_03", "con_04", "con_05",
+        "con_06", "con_07", "con_08", "con_09", "con_10"), "control", observation),
     study_arm = if_else(study_arm %in% c("exp_01", "exp_02", "exp_03", "exp_04", "exp_05",
         "exp_06", "exp_07", "exp_08", "exp_09", "exp_10"), "experimental", study_arm)) %>%
   pivot_longer(
@@ -80,16 +85,22 @@ study_df = tibble(
     names_to = "week",
     values_to = "weekly_data") %>%
   mutate(week = str_replace(week, "week_", "")) %>%
-  select(-files)
+  rename(participant_id = observation)
 study_df
 ```
+
+"Map" was used to iterate over file names and read in data for each subject, resulting in a new variable called "files" in the dataframe "study_df." The results were unnested, displaying the 8 weeks of data collected for each study participant. To tidy the data:
+
+* The "observation" variable values dropped the ".csv" to display only the study arm and participant number.
+* A new variable "study_arm" was created to indicate control or experimental arm.
+* The data were pivoted longer in order to display the week and the data collected that week, for each observation.
+* The "observation" variable was renamed "participant_id" to be more descriptive.
  
- subject_id = str_replace(subject_id, ".csv" , ""),
- week = str_replace(week, "week_", ""),
- study_arm = str_replace(study_arm, "con","control"),
- study_arm = str_replace(study_arm, "exp","experimental"),
-    
+
 ## Spaghetti Plot of Observations for Each Subject Over Time
+
+A spaghetti plot is made to demonstrate weekly data collected on each subject over time.
+
 ```{r Spaghetti Plot}
 study_df %>% 
   group_by(participant_id, week) %>% 
@@ -100,11 +111,14 @@ study_df %>%
     discrete = TRUE)
 ```
 
+Among the control arm, data for each control participant is variable, and there does not appear to be an net increase or net decrease trend in weekly_data over time. Among the experimental arm, weekly data for each experimental participant is variable, but there does appear to be a net increase in weekly_data over time. Overall, the expermintal group has higher weekly_data compared to the control group, with overlap among the groups in the middle of the distribution. 
+
+
 
 # Problem 3
 
 ## Set the Regression Design Elements
-```{r Regression}
+```{r Regression, cache = TRUE}
 linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
   regression_data = tibble(
     x = rnorm(n, mean = 0, sd = 1),
@@ -119,7 +133,7 @@ linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
   regression_results = rerun(100, linear_regression()) %>%
     bind_rows()
   
-#Function for Beta 1 = 0 - 6
+#Function for Beta 1 = 0 through 6
   results = tibble(
     beta1 = c(0, 1, 2, 3, 4, 5, 6)) %>%
     mutate(
