@@ -117,7 +117,12 @@ Among the control arm, data for each control participant is variable, and there 
 
 # Problem 3
 
+Problem 3 delves into the idea of effect size and whether a false null hypothesis will be rejected. The probability that a false null hypothesis is rejected is referred to as power, and depends on several factors including: the sample size, effect size, and the error variance. 
+
 ## Set the Regression Design Elements
+
+In order to conduct a simulation to explore power in a simple linear regression, certain design elements were set: n=30, xi1 draws from a standard Normal distribution, β0=2, and σ2=50.
+
 ```{r Regression, cache = TRUE}
 linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
   regression_data = tibble(
@@ -144,8 +149,12 @@ linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
 results
 ```
 
+The simulation generates 10,000 datasets from the model. Relevant variables for future analysis includes the "beta1" variable (true), "estimate" variable (estimate), and the "p.value" variable.
+
 
 ## Plot Showing the Proportion of Times the Null was Rejected
+
+This plot displays the power of the test, based on the proportion of times the null was rejected, and the true value of β1 on the x axis. The x-axis demonstrates the true β1 value, or the effect size, and the y-axis demonstrates the proportion of times that the null was rejected, or the power.
 
 ```{r Effect Size and Power}
 results %>%
@@ -157,20 +166,23 @@ results %>%
     proportion = count / sum(count),
     as.character(beta1)) %>%
   filter(rejection == "Rejected") %>%
-  #distinct(.keep_all = TRUE) %>%
   ggplot(aes(x = beta1, y = proportion)) + 
     geom_point(aes(color = "viridis"), show.legend = FALSE) + 
     geom_line(aes(color = "viridis"), show.legend = FALSE) +
     labs(
       title = "Association Between Effect Size and Power",
       x = "Beta1 True Value",
-      y = "Proportion of Null Rejection")  +
+      y = "Proportion that the Null was Rejected")  +
     viridis::scale_color_viridis(discrete = TRUE) 
 results
 ```
  
+In order to distinguish which p-values represent a value that would reject or fail to reject the null hypothesis, a new variable "Rejection" was created based on the cut-off 0.05. P-values less than 0.05 reject the null, and p-values greater than 0.05 fail to reject the null. A proportion was made to display the proportion of times that the null was rejected. As evidenced by the resulting plot, there is a positive increasing relationship between effect size and power. As the true β1 increases, power increases, following a sigmoid population growth curve. The slope of the curve increases from flat, to steep, and then appears to plateu when the true β1 is approximatley 6. 
+
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
+
+This plot displays the average estimate of β̂1 on the y-axis compared to the true value of β1 on the x-axis. Overlayed on this plot is another plot comparing the average estimate and true value of beta1, filtered among samples for which the null was rejcted. 
 
 ```{r Average and True Beta 1}
 plot1 = results %>%
@@ -200,7 +212,6 @@ ggplot(plot1, aes(x = beta1, y = mean_estimate)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-
-
+As displayed in the plot, the sample average of β̂1 across tests for which the null is rejected differs from the true value of β1. Apart from when the true β1 is 0 and 6, the sample average of β̂1 is greater than the true value of β1, which the greatest divergence when the true value of β1 is 1. Why?
 
 
