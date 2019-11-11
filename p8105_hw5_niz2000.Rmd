@@ -7,7 +7,7 @@ output: github_document
 
 # Problem 1
 
-Problem 1 loads the iris dataset from the tidyverse package, and includes some missing values in each column.
+Problem 1 loads the Iris dataset from the tidyverse package, and includes missing values in each column.
 
 ## Load Tidyverse and the Iris Data
 ```{r Load Iris Data}
@@ -21,12 +21,12 @@ iris_with_missing = iris %>%
 iris_with_missing
 ```
 
-Each of the 5 variables, "Sepal.Length," "Sepal.Width," "Petal.Length," "Petal.Width," and "Species" contain missing values, indicated by an NA. The descriptive variable names were preserved.
+Each of the 5 variables, "Sepal.Length," "Sepal.Width," "Petal.Length," "Petal.Width," and "Species" contain missing values, indicated by an NA. The descriptive variable names were preserved, and the "Species" variable was converted to a character variable.
 
 
 ## Function to Replace Missing Values
 
-This function takes a vector as an argument, and replaces all missing values from the uploaded Iris data titled "iris_with_missing," and returns a resulting vector titled "iris_complete."
+This function takes a vector as an argument, and replaces all missing values from the uploaded Iris dataset titled "iris_with_missing," and returns a resulting vector titled "iris_complete."
 
 ```{r Function to Replace Missing Values}
 replace_missing = function(x) {
@@ -40,13 +40,13 @@ iris_complete = map_df(iris_with_missing, replace_missing)
 iris_complete
 ```
 
-Missing values for each numeric variable "Sepal.Length," "Sepal.Width," "Petal.Length," and "Petal.Width" were replaced with the mean of non-missing values for that particular variable. For the character variable "Species," all missing values were replaced with the name "virginica." The map statement was used in the function.
+Missing values for each numeric variable "Sepal.Length," "Sepal.Width," "Petal.Length," and "Petal.Width" were replaced with the mean of the non-missing values for that particular variable. For the character variable "Species," all missing values were replaced with the name "virginica." The map statement was also used in the function to apply the function to the all of the columns.
 
 
 
 # Problem 2
 
-Problem 2 loads a zip file containing data from a longitudinal study, including a control arm and an experimental arm. Data for each participant is included in a separate file, and file names include the subject ID and arm.
+Problem 2 loads a zipfile containing data from a longitudinal study, including data from a control arm and an experimental arm. Data for each participant is included in a separate file, and file names include the subject ID and abbreviation of the arm, "con" or "exp." 
 
 ## Load in the Zipfile Data
 ```{r Load Zipfile Data}
@@ -56,11 +56,12 @@ data_df = tibble(
 data_df
 ```
 
-Loading the zip file data resulted in a dataframe that contains all file names, using the list.files function.
+Loading the zipfile data resulted in a dataframe that contains all file names, using the list.files function.
+
 
 ## Iterate over Files Names
 
-This next step creates a tidy dataframe containing data from all study participants, including their subject ID, the control or experimental treatment arm, and observations over time.
+This next step creates a tidy dataframe containing data from all study participants, including their subject ID, whether they were in the control or experimental treatment arm, and their weekly observations over time.
 
 ```{r Iterate Over File Names, message = FALSE, warning = FALSE} 
 data_df = function(path){
@@ -91,15 +92,15 @@ study_df
 
 "Map" was used to iterate over file names and read in data for each subject, resulting in a new variable called "files" in the dataframe "study_df." The results were unnested, displaying the 8 weeks of data collected for each study participant. To tidy the data:
 
-* The "observation" variable values dropped the ".csv" to display only the study arm and participant number.
+* The "observation" variable values dropped the ".csv" to display only the study arm abbreviation and participant number.
 * A new variable "study_arm" was created to indicate control or experimental arm.
 * The data were pivoted longer in order to display the week and the data collected that week, for each observation.
 * The "observation" variable was renamed "participant_id" to be more descriptive.
  
-
+ 
 ## Spaghetti Plot of Observations for Each Subject Over Time
 
-A spaghetti plot is made to demonstrate weekly data collected on each subject over time.
+The spaghetti plot demonstrates weekly data collected on each subject over time.
 
 ```{r Spaghetti Plot}
 study_df %>% 
@@ -111,17 +112,17 @@ study_df %>%
     discrete = TRUE)
 ```
 
-Among the control arm, data for each control participant is variable, and there does not appear to be an net increase or net decrease trend in weekly_data over time. Among the experimental arm, weekly data for each experimental participant is variable, but there does appear to be a net increase in weekly_data over time. Overall, the expermintal group has higher weekly_data compared to the control group, with overlap among the groups in the middle of the distribution. 
+Among the control arm, data for each control participant is variable week to week, but over the study period there does not appear to be a trend of a net increase or net decrease in weekly_data. Among the experimental arm, weekly data for each experimental participant is variable, but there does appear to be a net increase in weekly_data over time. Overall, the expermintal group has higher weekly_data compared to the control group, with overlap among the treatment arm groups in the middle of the distribution. By week 8 of the study, all observations in the treatment arm have higher data than all of the observations in the control arm. 
 
 
 
 # Problem 3
 
-Problem 3 delves into the idea of effect size and whether a false null hypothesis will be rejected. The probability that a false null hypothesis is rejected is referred to as power, and depends on several factors including: the sample size, effect size, and the error variance. 
+Problem 3 delves into effect size and whether a false null hypothesis will be rejected. The probability that a false null hypothesis is rejected is referred to as power, and depends on several factors including: the sample size, effect size, and the error variance. 
 
 ## Set the Regression Design Elements
 
-In order to conduct a simulation to explore power in a simple linear regression, certain design elements were set: n=30, xi1 draws from a standard Normal distribution, β0=2, and σ2=50.
+In order to conduct a simulation to explore the relationship between power and effect size in a simple linear regression, certain design elements were set: n=30, xi1 draws from a standard Normal distribution, β0=2, and σ2=50.
 
 ```{r Regression, cache = TRUE}
 linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
@@ -149,7 +150,7 @@ linear_regression= function(n = 30, beta0 = 2, beta1 = 0) {
 results
 ```
 
-The simulation generates 10,000 datasets from the model. Relevant variables for future analysis includes the "beta1" variable (true), "estimate" variable (estimate), and the "p.value" variable.
+The simulation generates 10,000 datasets from the model. Relevant variables for future analysis includes the "beta1" variable (the true value), "estimate" variable (the estimate value), and the "p.value" variable.
 
 
 ## Plot Showing the Proportion of Times the Null was Rejected
@@ -177,12 +178,12 @@ results %>%
 results
 ```
  
-In order to distinguish which p-values represent a value that would reject or fail to reject the null hypothesis, a new variable "Rejection" was created based on the cut-off 0.05. P-values less than 0.05 reject the null, and p-values greater than 0.05 fail to reject the null. A proportion was made to display the proportion of times that the null was rejected. As evidenced by the resulting plot, there is a positive increasing relationship between effect size and power. As the true β1 increases, power increases, following a sigmoid population growth curve. The slope of the curve increases from flat, to steep, and then appears to plateu when the true β1 is approximatley 6. 
+In order to distinguish which p-values represent a value that would reject or fail to reject the null hypothesis, a new variable "Rejection" was created based on the cut-off 0.05. P-values less than 0.05 reject the null, and p-values greater than 0.05 fail to reject the null. A proportion was made to display the proportion of times that the null was rejected. As evidenced by the resulting plot, there is a positive relationship between effect size and power. As the true β1 increases, power increases, following a sigmoid population growth curve. The slope of the curve increases from flatter, to steep, and then appears to begin to plateu when the true β1 is approximatley 6. 
 
 
 ## Plot Showing the Average Estimate and True Value of Beta 1
 
-This plot displays the average estimate of β̂1 on the y-axis compared to the true value of β1 on the x-axis. Overlayed on this plot is another plot comparing the average estimate and true value of beta1, filtered among samples for which the null was rejcted. 
+This plot displays the average estimate of β̂1 on the y-axis compared to the true value of β1 on the x-axis. Overlayed on this plot is another plot comparing the average estimate and true value of  β1, filtered among samples for which the null was rejcted. 
 
 ```{r Average and True Beta 1}
 plot1 = results %>%
@@ -212,7 +213,7 @@ ggplot(plot1, aes(x = beta1, y = mean_estimate)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-As displayed in the plot, the sample average of β̂1 across tests for which the null is rejected differs from the true value of β1. Apart from when the true β1 is 0 and 6, the sample average of β̂1 is greater than the true value of β1, which the greatest divergence when the true value of β1 is 1. 
+As displayed in the plot, the sample average of β̂1 across tests for which the null is rejected differs from the true value of β1. Apart from when the true β1 is 0 and 6, the sample average of β̂1 is greater than the true value of β1, with the greatest divergence when the true value of β1 is 1. 
 
-The sample average of β̂1 across tests for which the null is rejected is not approximately equal to the true value of β1, which is what we would expect. As we have filtered our estimates to only include significant p-values based on our regression simulation, these values are those that were significantly different from the true values of β1. As we wouldn't expect these filtered individual β̂1 estimates to be close to the true β1, we also don't expect that the average of those β̂1 estimates would be close to the true β1.
+The sample average of β̂1 across tests for which the null is rejected is not approximately equal to the true value of β1, which is what we would expect. As we have filtered our estimates to only include significant p-values based on our regression simulation, these are the values that were significantly different from the true values of β1. As we wouldn't expect these filtered individual β̂1 estimates to be close to the true β1, we also don't expect that the average of those β̂1 estimates would be significantly close to the true β1.
 
